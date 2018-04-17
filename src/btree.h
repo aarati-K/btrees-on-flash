@@ -11,16 +11,17 @@
 
 class BTree {
 public:
-	// Number of levels
+	// Number of levels in the B-tree
 	int numLevels;
 	// The file descriptors of the node files
 	int* fds;
 	// The fan out of the B-tree node
 	int fanOut;
 	// The number of pages per node
-	int nodeSize
+	int nodeSize;
 
-	int search(Key key);
+	int initializeEmptyTree(uint treeId, int fanOut, int nodeSize);
+	void search(Key key);
 	void insert(Key key);
 	void delete(Key key);
 private:
