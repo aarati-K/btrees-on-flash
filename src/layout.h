@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#typedef long Key;
-#typedef char* Page;
+typedef long Key;
+typedef char* Page;
 
 /*
  * The nodes of the B-tree are organised such that we have one file
