@@ -27,7 +27,7 @@ public:
 	int initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor);
 	void search(Key key);
 	void insert(Key key);
-	void delete(Key key);
+	void deleteKey(Key key);
 private:
 	// The file descriptors of the node files
 	int* fds;

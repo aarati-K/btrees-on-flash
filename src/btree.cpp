@@ -96,6 +96,6 @@ void BTree::insert(Key key) {
 
 }
 
-void BTree::delete(Key key) {
+void BTree::deleteKey(Key key) {
 
 }
