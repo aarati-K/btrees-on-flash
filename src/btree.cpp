@@ -197,7 +197,6 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 bool BTree::searchkey(Key key, char * node_to_insert) {
     // return the leaf node that should contain this key
 
-
     return false;
 }
 

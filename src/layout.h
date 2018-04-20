@@ -36,7 +36,7 @@ typedef struct Record {
  * The summary of the node file. We have one file for each level.
  * Within each node file, each node has contiguous pages.
  * However, the nodes within the node file need not be in any particular order.
- * The maximum size of the node file at a particular level 
+ * The maximum size of the node file at a particular level
  * is ((fanOut)^level)*(nodeSize)
  *
  * The NodeFileSummary construct is present in the first page of the node file.
