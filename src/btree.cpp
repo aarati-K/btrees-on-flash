@@ -84,7 +84,7 @@ int BTree::findNextNode(Key key, char* node) {
 			} else if (curRecord->key > key) {
 				assert(j > 0);
 				prevRecord = records[j-1];
-				return prevRecord->offset;
+				return prevRecord.offset;
 			}
 		}
 		// Has to be a leaf node
@@ -134,7 +134,6 @@ BTree::btInsertInternal(Node & b, int key, int *median)
             // insert to here  TODO related Record
             // every key above pos moves up one space
             b.insert_record(pos, mid, b2->offset);
-/*
             memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
             // new kid goes in pos + 1
             memmove(&b->kids[pos+2], &b->kids[pos+1], sizeof(*(b->keys)) * (b->numKeys - pos));
@@ -142,9 +141,9 @@ BTree::btInsertInternal(Node & b, int key, int *median)
             b->keys[pos] = mid;
             b->kids[pos+1] = b2;
             b->numKeys++;
-*/
         }
     }
+*/
 
     // we waste a tiny bit of space by splitting now
 
@@ -189,7 +188,7 @@ BTree::btInsertInternal(Node & b, int key, int *median)
         return 0;
     }
 */
-    return 0;
+    /* return 0; */
 }
 
 
@@ -239,7 +238,7 @@ void BTree::insert(Key key) {
     Node root_node;
     root_node.level = 0;
     root_node.offset = 0;
-    int b2 = btInsertInternal(root_node, key, &median);
+    Node b2 = btInsertInternal(root_node, key, &median);
 /*
     if(b2) {
         // basic issue here is that we are at the root

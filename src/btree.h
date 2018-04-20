@@ -1,6 +1,6 @@
 /***************************************************************
 * Header file for the B-tree.
-* This is a B-tree implementation with customizable 
+* This is a B-tree implementation with customizable
 * node size and fan out.
 ***************************************************************/
 
@@ -30,7 +30,7 @@ class Node {
     // TODO
     /*~Node() {
 
-    }*/ 
+    }*/
 
  public:
     int level;
@@ -57,7 +57,7 @@ public:
         int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
 	void search(Key key);
 	void insert(Key key);
-	void deletekey(Key key);
+	void deleteKey(Key key);
 private:
 	// The file descriptors of the node files
 	int* fds;
