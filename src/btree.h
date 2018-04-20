@@ -12,6 +12,33 @@
 #define KEY_FOUND 0
 #define KEY_NOT_FOUND -1
 
+class Node {
+    void load() {
+        // load content to node_content(malloc space for this)
+
+    }
+
+    void flush() {
+        // write out the node content
+
+    }
+
+    void insert_record(int pos, Key key, int offset) {
+        // insert a record to position (in memory)
+
+    }
+    // TODO
+    /*~Node() {
+
+    }*/ 
+
+ public:
+    int level;
+    int fd;
+    int offset;    //offset within the file
+    char * node_content;
+};
+
 class BTree {
 public:
 	// Number of levels in the B-tree
@@ -23,11 +50,14 @@ public:
 	// The initial fill factor of a node. Each page of
 	// the node is filled up to this factor initially.
 	float fillFactor;
+        std::string store_dir;
 
-	int initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor);
+        //loadfrom();
+	//flush();  ??
+        int initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor);
 	void search(Key key);
 	void insert(Key key);
-	void deleteKey(Key key);
+	void deletekey(Key key);
 private:
 	// The file descriptors of the node files
 	int* fds;
@@ -35,6 +65,8 @@ private:
 	char* nodeBuffer;
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
+        bool searchkey(Key key, char* node);
+        int btInsertInternal(Node & b, int key, int *median);
 };
 
 #endif // __BTREE_H__
