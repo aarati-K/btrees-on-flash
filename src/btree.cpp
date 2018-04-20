@@ -36,7 +36,6 @@ int BTree::initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fill
 
 
 void BTree::search(Key key) {
-	/*
         int i;
 	// Offset into the next level's node file
 	// Initial offset is 0, the level 0 node file has only the
@@ -53,20 +52,16 @@ void BTree::search(Key key) {
 			break;
 		}
 	}
-
 	if (offset != KEY_FOUND) {
 		assert(offset == KEY_NOT_FOUND);
 		cout << "Key " << key << " not found" << endl;
 	}
-        */
-
 }
 
 // The offset returned is KEY_FOUND = 0, if the key is found in the node
 // Otherwise the offset into the next level's node file is returned
 // If this is a leaf node, the offset returned is KEY_NOT_FOUND = -1
 int BTree::findNextNode(Key key, char* node) {
-       /*
 	int i, j;
 	char* page;
 	PageSummary* pageSummary;
@@ -95,11 +90,10 @@ int BTree::findNextNode(Key key, char* node) {
 		// Has to be a leaf node
 		return KEY_NOT_FOUND;
 	}
-        */
         return KEY_FOUND;
 }
 
-Node 
+Node
 BTree::btInsertInternal(Node & b, int key, int *median)
 {
 // median store the key need to be insert into b(offset) node
@@ -115,13 +109,13 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     pos = findNextNode(key, b.node_content);    //search this level  TODO need to return the position should be
 
     if(pos == KEY_FOUND) { //already exists
-        // nothing to do 
+        // nothing to do
         return 0;
     }
 
     if(b.level == this.numLevels) {       //if leaf level and still cannot find
         //TODO move keys
-        // everybody above pos moves up one space 
+        // everybody above pos moves up one space
         b.insert_record(pos, key, NULL);
 /*
         memmove(b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
@@ -132,14 +126,14 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 */
     } else {    // insert into child
 
-        // insert in child 
+        // insert in child
         // TODO construct the child node
         b2 = btInsertInternal( b->kids[pos] , key, &mid);
-        
-        // maybe insert a new key in b 
+
+        // maybe insert a new key in b
         if(b2) {    // need to add key to this layer, when inserting to child
             // insert to here  TODO related Record
-            // every key above pos moves up one space 
+            // every key above pos moves up one space
             b.insert_record(pos, mid, b2->offset);
 /*
             memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
@@ -154,13 +148,13 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     }
 
     // we waste a tiny bit of space by splitting now
-    // instead of on next insert 
+    // instead of on next insert
     if(b->numKeys >= MAX_KEYS) {    // if need split
         mid = b->numKeys/2;
 
         *median = b->keys[mid];
 
-        // make a new node for keys > median 
+        // make a new node for keys > median
         // picture is:
         //
         //      3 5 7
@@ -200,20 +194,20 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 
 bool BTree::searchkey(Key key, char * node_to_insert) {
     // return the leaf node that should contain this key
- 
+
 
     return false;
 }
 
 void BTree::insert(Key key) {
-/*    // find the key 
+/*    // find the key
     char * node_to_insert = NULL;
     bool need_insert = searchkey(key, node_to_insert);    // pointer to the nodebuffer of leafnode that should hold that key   + need to store kind of offset to each level of node during looking up
     if (!need_insert) {
         cout << "Key already exist\n" << endl;
         return;
     }
-    
+
     Key key_to_insert = key;
     while (key_to_insert != NULL && node_to_inserti!=NULL) {
         // insert to this node
@@ -224,12 +218,12 @@ void BTree::insert(Key key) {
         node_to_insert = NULL;
         if (node_to_insert->numrecords == this->fanout) {
             // split the node
-            
+
             key_to_insert = "";
-            node_to_insert = ""; 
+            node_to_insert = "";
 
         }
-        
+
     }
 
     // special: if need to split root?
@@ -243,12 +237,12 @@ void BTree::insert(Key key) {
     int median;
     Node root_node;
     root_node.level = 0;
-    root_node.offset = 0; 
+    root_node.offset = 0;
     int b2 = btInsertInternal(root_node, key, &median);
 /*
     if(b2) {
-        // basic issue here is that we are at the root 
-        // so if we split, we have to make a new root 
+        // basic issue here is that we are at the root
+        // so if we split, we have to make a new root
 
         b1 = malloc(sizeof(*b1));
         assert(b1);
