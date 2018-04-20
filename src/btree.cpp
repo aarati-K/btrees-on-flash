@@ -66,7 +66,7 @@ int BTree::findNextNode(Key key, char* node) {
 	char* page;
 	PageSummary* pageSummary;
 	Record** records;
-	Record* curRecord, prevRecord;
+	Record *curRecord, *prevRecord;
 	// Iterate over all pages
 	for (i = 0; i < this->nodeSize; i++) {
 		page = node + i * PAGE_SIZE;
@@ -84,7 +84,7 @@ int BTree::findNextNode(Key key, char* node) {
 			} else if (curRecord->key > key) {
 				assert(j > 0);
 				prevRecord = records[j-1];
-				return prevRecord.offset;
+				return prevRecord->offset;
 			}
 		}
 		// Has to be a leaf node
@@ -195,7 +195,6 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 
 bool BTree::searchkey(Key key, char * node_to_insert) {
     // return the leaf node that should contain this key
-
     return false;
 }
 

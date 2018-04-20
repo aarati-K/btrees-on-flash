@@ -39,11 +39,11 @@ typedef struct Record {
  * The maximum size of the node file at a particular level
  * is ((fanOut)^level)*(nodeSize)
  *
- * The NodeFileSummary construct is present in the first page of the node file.
+ * The Level construct is present in the first page of the node file.
  * The pages starting from 1 correspond to nodes. We want nodes to
  * start at page boundaries.
  */
-typedef struct NodeFileSummary {
+typedef struct Level {
 	int level;
 	int numNodes;
 
@@ -54,7 +54,7 @@ typedef struct NodeFileSummary {
 	};
 	// List of node records
 	struct NodeRecord** nodeRecords;
-} NodeFileSummary;
+} Level;
 
 typedef struct PageSummary {
 	// The node the page belongs to.

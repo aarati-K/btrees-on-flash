@@ -54,7 +54,7 @@ public:
 
         //loadfrom();
 	//flush();  ??
-        int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
+	int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
 	void search(Key key);
 	void insert(Key key);
 	void deleteKey(Key key);
@@ -65,8 +65,8 @@ private:
 	char* nodeBuffer;
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
-        bool searchkey(Key key, char* node);
-        Node btInsertInternal(Node & b, int key, int *median);
+    bool searchkey(Key key, char* node);
+    Node btInsertInternal(Node & b, int key, int *median);
 };
 
 #endif // __BTREE_H__
