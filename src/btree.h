@@ -23,11 +23,15 @@ public:
 	// The initial fill factor of a node. Each page of
 	// the node is filled up to this factor initially.
 	float fillFactor;
+        std::string store_dir;
 
-	int initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor);
+        //loadfrom();
+	//flush();  ??
+        int initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor);
 	void search(Key key);
 	void insert(Key key);
-	void delete(Key key);
+	void deletekey(Key key);
+        
 private:
 	// The file descriptors of the node files
 	int* fds;
@@ -35,6 +39,8 @@ private:
 	char* nodeBuffer;
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
+        bool searchkey(Key key, char* node);
+        int btInsertInternal(int b, int key, int *median);
 };
 
 #endif // __BTREE_H__
