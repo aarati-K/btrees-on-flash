@@ -12,6 +12,13 @@
 #define KEY_FOUND 0
 #define KEY_NOT_FOUND -1
 
+class Node {
+ public:
+    int level;
+    int fd;
+    int offset;    //offset within the file
+};
+
 class BTree {
 public:
 	// Number of levels in the B-tree
@@ -40,7 +47,7 @@ private:
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
         bool searchkey(Key key, char* node);
-        int btInsertInternal(int b, int key, int *median);
+        int btInsertInternal(Node & b, int key, int *median);
 };
 
 #endif // __BTREE_H__

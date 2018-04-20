@@ -96,27 +96,31 @@ int BTree::findNextNode(Key key, char* node) {
 		return KEY_NOT_FOUND;
 	}
         */
-        return 0;
+        return KEY_FOUND;
 }
 
 int 
-BTree::btInsertInternal(int b, int key, int *median)
+BTree::btInsertInternal(Node & b, int key, int *median)
 {
-/*
+// median store the key need to be insert into b(offset) node
+// return the offset of new splitted node
+
     int pos;
     int mid;
-    bTree b2;
+    //bTree b2;
+    int b2;
 
-    pos = findNextNode(key, node);    //search this level
+    // read this node
+    char * node_content = load_Node(b);       //TODO
+    pos = findNextNode(key, node_content);    //search this level  TODO need to return the position should be
 
     if(pos == KEY_FOUND) { //already exists
         // nothing to do 
         return 0;
     }
 
-    if(b->isLeafi) {       //TODO if leaf level and still cannot find TODO
-
-        // move keys
+    if(b->level == this->numLevels) {       //if leaf level and still cannot find
+        //TODO move keys
 
         // everybody above pos moves up one space 
         memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
@@ -128,15 +132,12 @@ BTree::btInsertInternal(int b, int key, int *median)
     } else {    // insert into child
 
         // insert in child 
-        b2 = btInsertInternal(b->kids[pos], key, &mid);
+        // TODO construct the child node
+        b2 = btInsertInternal( b->kids[pos] , key, &mid);
         
         // maybe insert a new key in b 
         if(b2) {    // need to add key to this layer, when inserting to child
-            //TODO read in this nodebuffer
-
-
-            // insert to here
-
+            // insert to here  TODO related Record
             // every key above pos moves up one space 
             memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
             // new kid goes in pos + 1
@@ -167,7 +168,7 @@ BTree::btInsertInternal(int b, int key, int *median)
         //      A B      C D
         //
         //TODO new node, split
-        b2 = malloc(sizeof(*b2));
+        b2 = malloc(sizeof(*b2));      //TODO need a new node
 
         b2->numKeys = b->numKeys - mid - 1;
         b2->isLeaf = b->isLeaf;
@@ -179,11 +180,15 @@ BTree::btInsertInternal(int b, int key, int *median)
 
         b->numKeys = mid;
 
+        // TODO write out the nodes
+
         return b2;
     } else {
+
+        //TODO write back the node b, when do we need to write back
+
         return 0;
     }
-*/
     return 0;
 }
 
@@ -227,6 +232,33 @@ void BTree::insert(Key key) {
 
 
 
+*/
+
+//    bTree b1;   /* new left child */
+//    bTree b2;   /* new right child */
+    int median;
+    Node root_node;
+    root_node.level = 0;
+    root_node.offset = 0; 
+    int b2 = btInsertInternal(root_node, key, &median);
+/*
+    if(b2) {
+        // basic issue here is that we are at the root 
+        // so if we split, we have to make a new root 
+
+        b1 = malloc(sizeof(*b1));
+        assert(b1);
+
+        // copy root to b1
+        memmove(b1, b, sizeof(*b));
+
+        // make root point to b1 and b2
+        b->numKeys = 1;
+        b->isLeaf = 0;
+        b->keys[0] = median;
+        b->kids[0] = b1;
+        b->kids[1] = b2;
+    }
 */
 
     return;
