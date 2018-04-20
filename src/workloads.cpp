@@ -57,3 +57,5 @@ void performWorkload(std::string filename)
 		}
 	infile.close();
 }
+
+/* vim: set filetype=cpp: */

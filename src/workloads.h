@@ -33,3 +33,5 @@ void generateWorkload(std::string filename, int num_ops, double searches, double
 void performWorkload(std::string filename);
 
 #endif
+
+/* vim: set filetype=cpp: */

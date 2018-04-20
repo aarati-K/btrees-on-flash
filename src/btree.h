@@ -68,3 +68,5 @@ private:
 };
 
 #endif // __BTREE_H__
+
+/* vim: set filetype=cpp: */

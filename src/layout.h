@@ -5,6 +5,8 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
+#define DEBUG(x) do { std::cerr << x; } while (0)
+
 #define KEY_FOUND 0
 #define KEY_NOT_FOUND -1
 
@@ -37,7 +39,7 @@ typedef struct Record {
 
 /*
  * The summary of the level file. We have one file for each level.
- * Each level file holds the nodes in that level. Within each level file, 
+ * Each level file holds the nodes in that level. Within each level file,
  * each node has contiguous pages. However, the nodes within the file
  * need not be in any particular order. The maximum size of the file
  * at a particular level is ((fanOut)^level)*(nodeSize)
@@ -88,3 +90,5 @@ typedef struct PageSummary {
 #define PAGE_MAX_RECORDS(page) ((PAGE_SIZE - PAGE_SUMMARY_SIZE)/RECORD_SIZE)
 
 #endif // __LAYOUT_H__
+
+/* vim: set filetype=cpp: */
