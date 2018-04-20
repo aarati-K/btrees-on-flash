@@ -11,8 +11,11 @@
 #include <iostream>
 using namespace std;
 
-int BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor) {
-        cout << "=== to initialize" << endl;
+
+int
+BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor)
+{
+        cout << "initializeEmptyTree()" << endl;
 	assert(fanOut > 1 && nodeSize > 0 && fillFactor >= 0.5);
 	this->fanOut = fanOut;
 	this->nodeSize = nodeSize;
@@ -34,8 +37,9 @@ int BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillF
 	return 0;
 }
 
-
-void BTree::search(Key key) {
+void
+BTree::searchKey(Key key)
+{
         int i;
 	// Offset into the next level's node file
 	// Initial offset is 0, the level 0 node file has only the
@@ -61,7 +65,9 @@ void BTree::search(Key key) {
 // The offset returned is KEY_FOUND = 0, if the key is found in the node
 // Otherwise the offset into the next level's node file is returned
 // If this is a leaf node, the offset returned is KEY_NOT_FOUND = -1
-int BTree::findNextNode(Key key, char* node) {
+int
+BTree::findNextNode(Key key, char* node)
+{
 	int i, j;
 	char* page;
 	PageSummary* pageSummary;
@@ -193,15 +199,19 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 
 
 
-bool BTree::searchkey(Key key, char * node_to_insert) {
+bool
+BTree::searchKey(Key key, char * node_to_insert)
+{
     // return the leaf node that should contain this key
     return false;
 }
 
-void BTree::insert(Key key) {
+void
+BTree::insertKey(Key key)
+{
 /*    // find the key
     char * node_to_insert = NULL;
-    bool need_insert = searchkey(key, node_to_insert);    // pointer to the nodebuffer of leafnode that should hold that key   + need to store kind of offset to each level of node during looking up
+    bool need_insert = searchKey(key, node_to_insert);    // pointer to the nodebuffer of leafnode that should hold that key   + need to store kind of offset to each level of node during looking up
     if (!need_insert) {
         cout << "Key already exist\n" << endl;
         return;
@@ -261,6 +271,8 @@ void BTree::insert(Key key) {
     return;
 }
 
-void BTree::deleteKey(Key key) {
+void
+BTree::deleteKey(Key key)
+{
 
 }

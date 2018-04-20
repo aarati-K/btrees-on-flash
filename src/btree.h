@@ -9,10 +9,8 @@
 
 #include "layout.h"
 
-#define KEY_FOUND 0
-#define KEY_NOT_FOUND -1
-
-class Node {
+class Node
+{
     void load() {
         // load content to node_content(malloc space for this)
 
@@ -32,14 +30,15 @@ class Node {
 
     }*/
 
- public:
+public:
     int level;
     int fd;
     int offset;    //offset within the file
     char * node_content;
 };
 
-class BTree {
+class BTree
+{
 public:
 	// Number of levels in the B-tree
 	int numLevels;
@@ -52,12 +51,14 @@ public:
 	float fillFactor;
         std::string store_dir;
 
+	int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
+
+	void searchKey(Key key);
+	void insertKey(Key key);
+	void deleteKey(Key key);
+
         //loadfrom();
 	//flush();  ??
-	int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
-	void search(Key key);
-	void insert(Key key);
-	void deleteKey(Key key);
 private:
 	// The file descriptors of the node files
 	int* fds;
@@ -65,7 +66,7 @@ private:
 	char* nodeBuffer;
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
-    bool searchkey(Key key, char* node);
+    bool searchKey(Key key, char* node);
     Node btInsertInternal(Node & b, int key, int *median);
 };
 

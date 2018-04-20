@@ -5,6 +5,9 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
+#define KEY_FOUND 0
+#define KEY_NOT_FOUND -1
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
