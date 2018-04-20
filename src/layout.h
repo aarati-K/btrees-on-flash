@@ -5,12 +5,12 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
 typedef long Key;
-typedef char * Value;
 typedef char* Page;
 
 /*
@@ -53,7 +53,7 @@ typedef struct NodeFileSummary {
 		int pageOffset;
 	};
 	// List of node records
-	struct NodeRecord* nodeRecords;
+	struct NodeRecord** nodeRecords;
 } NodeFileSummary;
 
 typedef struct PageSummary {

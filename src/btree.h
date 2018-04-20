@@ -58,7 +58,6 @@ public:
 	void search(Key key);
 	void insert(Key key);
 	void deletekey(Key key);
-        
 private:
 	// The file descriptors of the node files
 	int* fds;

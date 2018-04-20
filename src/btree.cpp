@@ -268,6 +268,6 @@ void BTree::insert(Key key) {
     return;
 }
 
-void BTree::deletekey(Key key) {
+void BTree::deleteKey(Key key) {
 
 }
