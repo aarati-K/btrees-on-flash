@@ -40,7 +40,7 @@ BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFacto
 void
 BTree::searchKey(Key key)
 {
-        int i;
+	int i;
 	// Offset into the next level's node file
 	// Initial offset is 0, the level 0 node file has only the
 	// the root node, so NodeFileSummary struct is not necessary.
@@ -63,7 +63,7 @@ BTree::searchKey(Key key)
 }
 
 // The offset returned is KEY_FOUND = 0, if the key is found in the node
-// Otherwise the offset into the next level's node file is returned
+// Otherwise the offset into the next level's file is returned
 // If this is a leaf node, the offset returned is KEY_NOT_FOUND = -1
 int
 BTree::findNextNode(Key key, char* node)

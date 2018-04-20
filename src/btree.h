@@ -13,17 +13,14 @@ class Node
 {
     void load() {
         // load content to node_content(malloc space for this)
-
     }
 
     void flush() {
         // write out the node content
-
     }
 
     void insert_record(int pos, Key key, int offset) {
         // insert a record to position (in memory)
-
     }
     // TODO
     /*~Node() {
@@ -60,7 +57,7 @@ public:
         //loadfrom();
 	//flush();  ??
 private:
-	// The file descriptors of the node files
+	// The file descriptors of the level files
 	int* fds;
 	// Node buffer, the node is loaded into the buffer
 	char* nodeBuffer;

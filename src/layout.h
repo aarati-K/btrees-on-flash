@@ -22,7 +22,7 @@ typedef char* Page;
  *
  * Each "Record" of the B-tree index contains a key, an offset to
  * the record in the "data file" corresponding to the key,
- * and the page offset into the next level's node file.
+ * and the page offset into the next level's file.
  */
 typedef struct Record {
 	Key key;
@@ -31,33 +31,33 @@ typedef struct Record {
 	// but this isn't neccessary for our experiment.
 	// long recordOffset;
 
-	// page offset of the child node in the next level's node file.
+	// page offset of the child node in the next level's file.
 	int offset;
 } Record;
 
 /*
- * The summary of the node file. We have one file for each level.
- * Within each node file, each node has contiguous pages.
- * However, the nodes within the node file need not be in any particular order.
- * The maximum size of the node file at a particular level
- * is ((fanOut)^level)*(nodeSize)
+ * The summary of the level file. We have one file for each level.
+ * Each level file holds the nodes in that level. Within each level file, 
+ * each node has contiguous pages. However, the nodes within the file
+ * need not be in any particular order. The maximum size of the file
+ * at a particular level is ((fanOut)^level)*(nodeSize)
  *
- * The Level construct is present in the first page of the node file.
+ * The LevelSummary construct is present in the first page of the level file.
  * The pages starting from 1 correspond to nodes. We want nodes to
  * start at page boundaries.
  */
-typedef struct Level {
+typedef struct LevelSummary {
 	int level;
 	int numNodes;
 
 	struct NodeRecord {
 		int nodeId;
-		// Page offset within the node file
+		// Page offset within the level file
 		int pageOffset;
 	};
 	// List of node records
 	struct NodeRecord** nodeRecords;
-} Level;
+} LevelSummary;
 
 typedef struct PageSummary {
 	// The node the page belongs to.
@@ -65,7 +65,7 @@ typedef struct PageSummary {
 	// A node consists of multiple pages.
 	// This is the page offset witin the node;
 	int nodeOffset;
-	// The page offset into the node file for this level
+	// The page offset into the level file for this level
 	int offset;
 	// Is the page dirty
 	bool isDirty;
