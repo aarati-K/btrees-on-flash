@@ -5,11 +5,12 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#typedef long Key;
-#typedef char* Page;
+typedef long Key;
+typedef char* Page;
 
 /*
  * The nodes of the B-tree are organised such that we have one file
@@ -34,9 +35,12 @@ typedef struct Record {
  * The summary of the node file. We have one file for each level.
  * Within each node file, each node has contiguous pages.
  * However, the nodes within the node file need not be in any particular order.
- * This is done to avoid the growth of node file needlessly.
  * The maximum size of the node file at a particular level 
  * is ((fanOut)^level)*(nodeSize)
+ *
+ * The NodeFileSummary construct is present in the first page of the node file.
+ * The pages starting from 1 correspond to nodes. We want nodes to
+ * start at page boundaries.
  */
 typedef struct NodeFileSummary {
 	int level;
@@ -48,7 +52,7 @@ typedef struct NodeFileSummary {
 		int pageOffset;
 	};
 	// List of node records
-	struct NodeRecord* nodeRecords;
+	struct NodeRecord** nodeRecords;
 } NodeFileSummary;
 
 typedef struct PageSummary {
@@ -74,8 +78,9 @@ typedef struct PageSummary {
 #define RECORD_SIZE sizeof(Record)
 #define PAGE_SUMMARY_SIZE sizeof(PageSummary)
 #define PAGE_SUMMARY(page) ((PageSummary*) page)
+#define NODE_ID(nodePtr) (PAGE_SUMMARY(nodePtr)->nodeId)
 #define PAGE_NUM_RECORDS(page) (PAGE_SUMMARY(page)->numRecords)
-#define PAGE_RECORDS(page) ((Records*)(page + PAGE_SUMMARY_SIZE))
+#define PAGE_RECORDS(page) ((Record**)(page + PAGE_SUMMARY_SIZE))
 #define PAGE_MAX_RECORDS(page) ((PAGE_SIZE - PAGE_SUMMARY_SIZE)/RECORD_SIZE)
 
 #endif // __LAYOUT_H__
