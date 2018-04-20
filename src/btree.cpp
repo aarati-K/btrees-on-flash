@@ -11,7 +11,7 @@
 #include <iostream>
 using namespace std;
 
-int BTree::initializeEmptyTree(uint treeId, int fanOut, int nodeSize, float fillFactor) {
+int BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor) {
         cout << "=== to initialize" << endl;
 	assert(fanOut > 1 && nodeSize > 0 && fillFactor >= 0.5);
 	this->fanOut = fanOut;
@@ -40,9 +40,9 @@ void BTree::search(Key key) {
 	// Offset into the next level's node file
 	// Initial offset is 0, the level 0 node file has only the
 	// the root node, so NodeFileSummary struct is not necessary.
-	int pageOffset = 0;
-	for (i = 0; i < this->numLevels, i++) {
-		int fd = this->fd[i];
+	int offset = 0;
+	for (i = 0; i < this->numLevels; i++) {
+		int fd = this->fds[i];
 		lseek(fd, offset * PAGE_SIZE, SEEK_SET);
 		read(fd, this->nodeBuffer, this->nodeSize*PAGE_SIZE);
 		cout << "Node id: " << NODE_ID(nodeBuffer) <<  ", Tree level: " << i << endl;
@@ -98,14 +98,14 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 {
 // median store the key need to be insert into b(offset) node
 // return the offset of new splitted node
-
+/*
     int pos;
     int mid;
     //bTree b2;
     Node b2;
 
     // read this node
-    b.load_Node();      //TODO
+    b.load();      //TODO
     pos = findNextNode(key, b.node_content);    //search this level  TODO need to return the position should be
 
     if(pos == KEY_FOUND) { //already exists
@@ -117,13 +117,12 @@ BTree::btInsertInternal(Node & b, int key, int *median)
         //TODO move keys
         // everybody above pos moves up one space
         b.insert_record(pos, key, NULL);
-/*
+
         memmove(b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
 
         // insert this key
         b->keys[pos] = key;
         b->numKeys++;
-*/
     } else {    // insert into child
 
         // insert in child
@@ -148,7 +147,9 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     }
 
     // we waste a tiny bit of space by splitting now
+
     // instead of on next insert
+/*
     if(b->numKeys >= MAX_KEYS) {    // if need split
         mid = b->numKeys/2;
 
@@ -187,6 +188,7 @@ BTree::btInsertInternal(Node & b, int key, int *median)
 
         return 0;
     }
+*/
     return 0;
 }
 
