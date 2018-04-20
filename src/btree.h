@@ -13,10 +13,30 @@
 #define KEY_NOT_FOUND -1
 
 class Node {
+    void load() {
+        // load content to node_content(malloc space for this)
+
+    }
+
+    void flush() {
+        // write out the node content
+
+    }
+
+    void insert_record(int pos, Key key, int offset) {
+        // insert a record to position (in memory)
+
+    }
+    // TODO
+    /*~Node() {
+
+    }*/ 
+
  public:
     int level;
     int fd;
     int offset;    //offset within the file
+    char * node_content;
 };
 
 class BTree {

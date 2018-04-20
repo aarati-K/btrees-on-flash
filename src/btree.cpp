@@ -99,7 +99,7 @@ int BTree::findNextNode(Key key, char* node) {
         return KEY_FOUND;
 }
 
-int 
+Node 
 BTree::btInsertInternal(Node & b, int key, int *median)
 {
 // median store the key need to be insert into b(offset) node
@@ -108,27 +108,28 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     int pos;
     int mid;
     //bTree b2;
-    int b2;
+    Node b2;
 
     // read this node
-    char * node_content = load_Node(b);       //TODO
-    pos = findNextNode(key, node_content);    //search this level  TODO need to return the position should be
+    b.load_Node();      //TODO
+    pos = findNextNode(key, b.node_content);    //search this level  TODO need to return the position should be
 
     if(pos == KEY_FOUND) { //already exists
         // nothing to do 
         return 0;
     }
 
-    if(b->level == this->numLevels) {       //if leaf level and still cannot find
+    if(b.level == this.numLevels) {       //if leaf level and still cannot find
         //TODO move keys
-
         // everybody above pos moves up one space 
-        memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
+        b.insert_record(pos, key, NULL);
+/*
+        memmove(b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
 
         // insert this key
         b->keys[pos] = key;
         b->numKeys++;
-
+*/
     } else {    // insert into child
 
         // insert in child 
@@ -139,6 +140,8 @@ BTree::btInsertInternal(Node & b, int key, int *median)
         if(b2) {    // need to add key to this layer, when inserting to child
             // insert to here  TODO related Record
             // every key above pos moves up one space 
+            b.insert_record(pos, mid, b2->offset);
+/*
             memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
             // new kid goes in pos + 1
             memmove(&b->kids[pos+2], &b->kids[pos+1], sizeof(*(b->keys)) * (b->numKeys - pos));
@@ -146,6 +149,7 @@ BTree::btInsertInternal(Node & b, int key, int *median)
             b->keys[pos] = mid;
             b->kids[pos+1] = b2;
             b->numKeys++;
+*/
         }
     }
 
