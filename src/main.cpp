@@ -6,7 +6,7 @@
 
 int main()
 {
-    std::cout << "main()" << std::endl;
+	std::cout << "main()" << std::endl;
 
     BTree test_tree;
     test_tree.initializeEmptyTree(0, 5, 3, 0.8);
@@ -21,7 +21,7 @@ int main()
     /* generateWorkload(std::string("delete_heavy"), 100, 0.20, 0.20, 0.60); */
     /* performWorkload(std::string("delete_heavy")); */
 
-    return 0;
+	return 0;
 }
 
 /* vim: set filetype=cpp: */
