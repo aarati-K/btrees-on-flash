@@ -10,7 +10,8 @@ int main()
 
     BTree test_tree;
     test_tree.initializeEmptyTree(0, 3, 3, 0.8);
-
+    test_tree.insertKey(5);
+    test_tree.insertKey(10);
     // Workloads
     // filename, num_ops, searches, insertions, deletions
     /* generateWorkload(std::string("search_heavy"), 100, 0.80, 0.10, 0.10); */

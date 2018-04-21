@@ -11,6 +11,12 @@
 #include <iostream>
 using namespace std;
 
+int BTree::create_new_file() {
+   int fd = open((store_dir + to_string(numLevels)).c_str(), O_RDWR | O_CREAT); 
+   this->fd_q.push_front(fd);
+   return fd;
+}
+
 
 int
 BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor)
@@ -108,6 +114,8 @@ Node
 BTree::btInsertInternal(Node & b, int key, int *median)
 {
     DEBUG("btInsertInternal()");
+    // return a node with the key if need to split this node b
+    // else return 0
 
     /*
     // median store the key need to be insert into b(offset) node
@@ -160,7 +168,7 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     // we waste a tiny bit of space by splitting now
 
     // instead of on next insert
-    if(b->numKeys >= MAX_KEYS) {    // if need split
+    if(b->numKeys >= this->fanout) {    // if need split
     mid = b->numKeys/2;
 
      *median = b->keys[mid];
@@ -246,22 +254,41 @@ BTree::insertKey(Key key)
 
     // special: if need to split root?
 
-
+    */
     //    bTree b1;   // new left child
     //    bTree b2;   // new right child
-    int median;
+    
     Node root_node;
+    if (this->numLevels == 0) {
+        root_node.level = 0;
+        root_node.fd = create_new_file();
+        root_node.offset = 1;
+        root_node.load();
+        root_node.insert_record(-1, key, -1);
+        root_node.flush();
+        return;
+    }
+    
+    int median;
     root_node.level = 0;
-    root_node.offset = 0;
-    Node b2 = btInsertInternal(root_node, key, &median);
+    root_node.fd =this->fd_q[0];
+    root_node.offset =1;
 
-    if(b2) {
+    Node b2 = btInsertInternal(root_node, key, &median);
+    if(b2.valid) {   // TODO
 	// basic issue here is that we are at the root
 	// so if we split, we have to make a new root
 
-	b1 = malloc(sizeof(*b1));
-	assert(b1);
+        updata_levels();
+        Node new_root_node;
+        new_root_node.level = 0;
+        new_root_node.fd = create_new_file();
+        new_root_node.offset = 1;
+        new_root_node.load();
+        new_root_node.insert_record(-1, -1, root_node.offset);
+        new_root_node.insert_record(0, median, b2.offset);
 
+/*
 	// copy root to b1
 	memmove(b1, b, sizeof(*b));
 
@@ -271,9 +298,9 @@ BTree::insertKey(Key key)
 	b->keys[0] = median;
 	b->kids[0] = b1;
 	b->kids[1] = b2;
+*/
     }
     return;
-    */
 }
 
 void

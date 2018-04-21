@@ -8,9 +8,11 @@
 #define __BTREE_H__
 
 #include "layout.h"
+#include <deque>
 
 class Node
 {
+public:
     void load() {
         // load content to node_content(malloc space for this)
     }
@@ -26,8 +28,7 @@ class Node
     /*~Node() {
 
     }*/
-
-public:
+    bool valid = false;
     int level;
     int fd;
     int offset;    //offset within the file
@@ -59,12 +60,15 @@ public:
 private:
 	// The file descriptors of the level files
 	int* fds;
+
+        std::deque<int> fd_q;
 	// Node buffer, the node is loaded into the buffer
 	char* nodeBuffer;
 	// Find the next node while searching the tree
 	int findNextNode(Key key, char* node);
-    bool searchKey(Key key, char* node);
-    Node btInsertInternal(Node & b, int key, int *median);
+        bool searchKey(Key key, char* node);
+        Node btInsertInternal(Node & b, int key, int *median);
+        int create_new_file();
 };
 
 #endif // __BTREE_H__
