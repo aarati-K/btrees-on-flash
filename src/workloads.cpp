@@ -23,14 +23,14 @@ void generateWorkload(std::string filename, int num_ops, double searches, double
 		double rand_op = double(rand()) / double(RAND_MAX);
 		Key rand_key = (long) round(double(rand()) / double(RAND_MAX) * num_ops);
 		if (rand_op < searches) {
-			/* std::cout << "search " << rand_key << std::endl; */
-			outfile << "search " << rand_key << std::endl;
+			std::cout << "search " << rand_key << std::endl;
+			/* outfile << "search " << rand_key << std::endl; */
 		} else if (rand_op < (searches + insertions)) {
-			/* std::cout << "insert " << rand_key << std::endl; */
-			outfile << "insert " << rand_key << std::endl;
+			std::cout << "insert " << rand_key << std::endl;
+			/* outfile << "insert " << rand_key << std::endl; */
 		} else if (rand_op < (searches + insertions + deletions)) {
-			/* std::cout << "delete " << rand_key << std::endl; */
-			outfile << "delete " << rand_key << std::endl;
+			std::cout << "delete " << rand_key << std::endl;
+			/* outfile << "delete " << rand_key << std::endl; */
 		}
 	}
 	outfile.close();
@@ -39,23 +39,23 @@ void generateWorkload(std::string filename, int num_ops, double searches, double
 /* void performWorkload(BTree tree, std::string filename) */
 void performWorkload(std::string filename)
 {
-	std::cout << "perform" << std::endl;
 	std::ifstream infile(filename);
 	std::string operation;
 	Key key;
-	while (infile >> operation >> key)
+	while (infile >> operation >> key) {
 		/* std::cout << operation << " " << key << "\n"; */
 		if (operation == "search") {
-			std::cout << operation << " " << key << "\n";
-			/* tree.search(key); */
+			/* std::cout << operation << " " << key << "\n"; */
+			tree.search(key);
 		} else if (operation == "insert") {
-			std::cout << operation << " " << key << "\n";
-			/* tree.insert(key); */
+			/* std::cout << operation << " " << key << "\n"; */
+			tree.insert(key);
 		} else if (operation == "delete") {
-			std::cout << operation << " " << key << "\n";
-			/* tree.delete(key); */
+			/* std::cout << operation << " " << key << "\n"; */
+			tree.delete(key);
 		}
+	}
 	infile.close();
 }
 
-/* vim: set filetype=cpp: */
+// vim:sw=4:ts=4
