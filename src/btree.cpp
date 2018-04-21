@@ -58,7 +58,7 @@ void Node::insert_record(int pos, Key key, int offset) {
 
 	Record** nodeRecords = this->summary->records;
 	int numRecords = this->summary->numRecords;
-	assert(pos <= numRecords);
+	//assert(pos <= numRecords);
 	// The array one right starting at pos
 	for (i=pos; i <= numRecords; i++) {
 		tempRecord.key = nodeRecords[i]->key;
@@ -273,13 +273,7 @@ BTree::insertKey(Key key)
     Node root_node;
     if (this->numLevels == 0) {
         cout << "inserting root node: " << key << endl;
-        root_node.level = 0;
-        root_node.fd = create_new_file();
-        root_node.offset = 1;
-        //root_node.load();
-	root_node.node_content = (char*)malloc(sizeof(char) * nodeSize * PAGE_SIZE);
-        
-        root_node.nodeSummary = NODE_SUMMARY(root_node.node_content);
+        root_node.initialize(0, create_new_file(), 1, this->nodeSize);
         root_node.insert_record(0, key, INVALID_OFFSET);
         root_node.flush();
         return;
