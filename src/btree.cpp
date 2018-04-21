@@ -1,18 +1,52 @@
-#include <assert.h>
 #include "btree.h"
 #include "layout.h"
+#include <assert.h>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/syslimits.h>
 #include <unistd.h>
-#include <iostream>
 using namespace std;
 
+// Create file which maps file descriptors to levels in B-Tree
+void BTree::writeMap()
+{
+	DEBUG("writeMap()");
+	std::ofstream mapFile(this->store_dir + std::string("map"));
+	// Map each fd to level
+	for (int i = 0; i < this->numLevels; i++) {
+		int fd = this->fd_q[i];
+		char filePath[PATH_MAX];
+		if (fcntl(fd, F_GETPATH, filePath) != -1) {
+			mapFile << i << " " << filePath << std::endl;
+		}
+	}
+	mapFile.close();
+}
+
+// Populate fd_q with open file for each level from map file
+void BTree::loadMap()
+{
+	DEBUG("loadMap()");
+	std::ifstream mapFile(this->store_dir + std::string("map"));
+	int level, filename;
+	// Open each level file and map fd to level in fd_q
+	while (mapFile >> level >> filename) {
+		int fd = open((store_dir + filename.c_str(), O_RDWR);
+		this->fd_q.push_back(fd);
+	}
+	mapFile.close();
+}
+
+// Create file for level of BTree
 int BTree::create_new_file() {
-   int fd = open((store_dir + to_string(numLevels)).c_str(), O_RDWR | O_CREAT); 
+   int fd = open((store_dir + to_string(numLevels)).c_str(), O_RDWR | O_CREAT);
    this->fd_q.push_front(fd);
    return fd;
 }
@@ -334,4 +368,4 @@ BTree::deleteKey(Key key)
 
 
 
-/* vim: set filetype=cpp: */
+// vim:sw=4:ts=4

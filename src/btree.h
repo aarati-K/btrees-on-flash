@@ -63,13 +63,15 @@ public:
 	void insertKey(Key key);
 	void deleteKey(Key key);
 
-	//loadfrom();
-	//flush();  ??
+	// Write and load map of levels to filenames
+	void writeMap();
+	void loadMap();
+
 private:
 	// The file descriptors of the level files
 	int* fds;
-
-        std::deque<int> fd_q;
+	// ?
+	std::deque<int> fd_q;
 	// Node buffer, the node is loaded into the buffer
 	char* nodeBuffer;
 	// Find the next node while searching the tree
@@ -81,4 +83,4 @@ private:
 
 #endif // __BTREE_H__
 
-/* vim: set filetype=cpp: */
+// vim:sw=4:ts=4

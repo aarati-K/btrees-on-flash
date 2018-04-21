@@ -5,7 +5,7 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
-#define DEBUG(x) do { std::cerr << x; } while (0)
+#define DEBUG(x) do { std::cerr << x << std::endl; } while (0)
 
 #define KEY_FOUND 0
 #define KEY_NOT_FOUND -1
@@ -102,4 +102,4 @@ typedef struct NodeSummary {
 
 #endif // __LAYOUT_H__
 
-/* vim: set filetype=cpp: */
+// vim:sw=4:ts=4
