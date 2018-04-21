@@ -12,8 +12,58 @@
 using namespace std;
 
 
+void Node::load() {
+	this->node_content = (char*)malloc(sizeof(char) * this->size * PAGE_SIZE);
+	lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
+	read(fd, this->node_content, this->size * PAGE_SIZE);
+	this->nodeSummary = NODE_SUMMARY(this->node_content);
+}
+
+void Node::flush() {
+	if (!this->nodeSummary->isDirty) {
+		return;
+	}
+	// Set this to false before writing
+	this->nodeSummary->isDirty = false;
+	lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
+	write(fd, this->node_content, this->size * PAGE_SIZE);
+}
+
+void Node::insert_record(int pos, Key key, int offset) {
+	int i;
+	Record tempRecord, prevRecord;
+
+	// Initially set the previous record to temp record for copying
+	prevRecord.key = key;
+	prevRecord.offset = offset;
+
+	Record** nodeRecords = this->nodeSummary->records;
+	int numRecords = this->nodeSummary->numRecords;
+	assert(pos <= numRecords);
+	// The array one right starting at pos
+	for (i=pos; i <= numRecords; i++) {
+		tempRecord.key = nodeRecords[i]->key;
+		tempRecord.offset = nodeRecords[i]->offset;
+		nodeRecords[i]->key = prevRecord.key;
+		nodeRecords[i]->offset = prevRecord.offset;
+		prevRecord.key = tempRecord.key;
+		prevRecord.offset = tempRecord.offset;
+	}
+
+	// Update the node summary
+	if (pos == 0) {
+		// the new key is the lowest
+		this->nodeSummary->lowKey = key;
+	} else if (pos == this->nodeSummary->numRecords) {
+		// the new key is the highest
+		this->nodeSummary->highKey = key;
+	}
+	this->nodeSummary->numRecords = this->nodeSummary->numRecords + 1;
+	this->nodeSummary->isDirty = true;
+}
+
 int
-BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor)
+BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor=0.5)
 {
     DEBUG("initializeEmptyTree()");
 
@@ -28,8 +78,8 @@ BTree::initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFacto
     this->fds = (int *) malloc(sizeof(int));
     this->fds[0] = open((store_dir + "0.txt").c_str() , O_RDWR | O_CREAT);
     if (this->fds[0] < 0) {
-	cout << "ERROR: Could not create file for root node" << endl;
-	exit(1);
+		cout << "ERROR: Could not create file for root node" << endl;
+		exit(1);
     }
     this->numLevels = 1; // Just the root
 
@@ -47,17 +97,17 @@ BTree::searchKey(Key key)
     // Offset into the next level's node file
     // Initial offset is 0, the level 0 node file has only the
     // the root node, so NodeFileSummary struct is not necessary.
-    int offset = 0;
+    int offset = 1;
     for (i = 0; i < this->numLevels; i++) {
-	int fd = this->fds[i];
-	lseek(fd, offset * PAGE_SIZE, SEEK_SET);
-	read(fd, this->nodeBuffer, this->nodeSize*PAGE_SIZE);
-	cout << "Node id: " << NODE_ID(nodeBuffer) <<  ", Tree level: " << i << endl;
-	offset = this->findNextNode(key, nodeBuffer);
-	if (offset == KEY_FOUND) {
-	    cout << "Key " << key << " found" << endl;
-	    break;
-	}
+		int fd = this->fds[i];
+		lseek(fd, offset * PAGE_SIZE, SEEK_SET);
+		read(fd, this->nodeBuffer, this->nodeSize*PAGE_SIZE);
+		cout << "Node id: " << NODE_ID(nodeBuffer) <<  ", Tree level: " << i << endl;
+		offset = this->findNextNode(key, nodeBuffer);
+		if (offset == KEY_FOUND) {
+		    cout << "Key " << key << " found" << endl;
+		    break;
+		}
     }
     if (offset != KEY_FOUND) {
 	assert(offset == KEY_NOT_FOUND);

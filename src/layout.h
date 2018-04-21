@@ -61,6 +61,7 @@ typedef struct LevelSummary {
 	struct NodeRecord** nodeRecords;
 } LevelSummary;
 
+// Not used in this implementation
 typedef struct PageSummary {
 	// The node the page belongs to.
 	int nodeId;
@@ -78,10 +79,30 @@ typedef struct PageSummary {
 	// Number of records in this page
 	int numRecords;
 	// The list of records in this page
+	Record** records;
 } PageSummary;
+
+typedef struct NodeSummary {
+	// The node id
+	int nodeId;
+	// Is the node dirty
+	bool isDirty;
+	// Lowest key in the node
+	Key lowKey;
+	// Highest key in the node
+	Key highKey;
+	// Number of records in the node
+	int numRecords;
+	// The list of records in the node
+	Record** records;
+} NodeSummary;
 
 #define PAGE_SIZE 2048
 #define RECORD_SIZE sizeof(Record)
+#define NODE_SUMMARY(nodePtr) ((NodeSummary*)nodePtr)
+#define NODE_ID_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->nodeId)
+#define NODE_NUM_RECORDS_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->numRecords)
+#define NODE_RECORDS_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->records)
 #define PAGE_SUMMARY_SIZE sizeof(PageSummary)
 #define PAGE_SUMMARY(page) ((PageSummary*) page)
 #define NODE_ID(nodePtr) (PAGE_SUMMARY(nodePtr)->nodeId)
