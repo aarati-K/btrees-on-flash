@@ -5,7 +5,7 @@
 #ifndef __LAYOUT_H__
 #define __LAYOUT_H__
 
-#define DEBUG(x) do { std::cerr << x; } while (0)
+#define DEBUG(x) do { std::cerr << x <<endl; } while (0)
 
 #define KEY_FOUND 0
 #define KEY_NOT_FOUND -1
@@ -57,8 +57,6 @@ typedef struct LevelSummary {
 		// Page offset within the level file
 		int pageOffset;
 	};
-	// List of node records
-	struct NodeRecord** nodeRecords;
 } LevelSummary;
 
 // Not used in this implementation
@@ -78,8 +76,6 @@ typedef struct PageSummary {
 	Key highKey;
 	// Number of records in this page
 	int numRecords;
-	// The list of records in this page
-	Record** records;
 } PageSummary;
 
 typedef struct NodeSummary {
@@ -93,23 +89,16 @@ typedef struct NodeSummary {
 	Key highKey;
 	// Number of records in the node
 	int numRecords;
-	// The list of records in the node
-	Record** records;
 } NodeSummary;
 
 #define PAGE_SIZE 2048
 #define RECORD_SIZE sizeof(Record)
+#define NODE_SUMMARY_SIZE sizeof(NodeSummary)
 #define INVALID_OFFSET -1
 #define NODE_SUMMARY(nodePtr) ((NodeSummary*)nodePtr)
 #define NODE_ID_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->nodeId)
 #define NODE_NUM_RECORDS_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->numRecords)
-#define NODE_RECORDS_FROM_SUMMARY(nodePtr) (NODE_SUMMARY(nodePtr)->records)
-#define PAGE_SUMMARY_SIZE sizeof(PageSummary)
-#define PAGE_SUMMARY(page) ((PageSummary*) page)
-#define NODE_ID(nodePtr) (PAGE_SUMMARY(nodePtr)->nodeId)
-#define PAGE_NUM_RECORDS(page) (PAGE_SUMMARY(page)->numRecords)
-#define PAGE_RECORDS(page) ((Record**)(page + PAGE_SUMMARY_SIZE))
-#define PAGE_MAX_RECORDS(page) ((PAGE_SIZE - PAGE_SUMMARY_SIZE)/RECORD_SIZE)
+#define NODE_RECORDS(nodePtr) ((Record*)(nodePtr + NODE_SUMMARY_SIZE))
 
 #endif // __LAYOUT_H__
 

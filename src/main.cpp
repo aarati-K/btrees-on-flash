@@ -9,8 +9,11 @@ int main()
 	std::cout << "main()" << std::endl;
 
     BTree test_tree;
-    test_tree.initializeEmptyTree(0, 5, 3, 0.8);
-    test_tree.insertKey(5);
+    test_tree.initializeEmptyTree(0, 4, 3, 0.8);
+    test_tree.insertKey(100);
+    test_tree.insertKey(1000);
+    test_tree.insertKey(10000);
+    test_tree.insertKey(100000);
     //test_tree.insertKey(10);
     // Workloads
     // filename, num_ops, searches, insertions, deletions

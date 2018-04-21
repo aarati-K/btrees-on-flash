@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <iostream>
+#include <sys/stat.h>
+
 using namespace std;
 
 int BTree::create_new_file() {
@@ -16,19 +18,24 @@ int BTree::create_new_file() {
    this->fd_q.push_front(fd);
    return fd;
 }
+
 void Node::initialize(int level, int fd, int offset, int size) {
-	this->level = level;
+	cout << "    initialize node with: level: "  <<  level << " fd: " << fd << " offset: " << offset << " size: " << size << endl;
+        this->level = level;
 	this->fd = fd;
 	this->offset = offset;
 	this->size = size;
 	if (!this->memoryAllocated) {
 		this->node_content = (char*)malloc(sizeof(char) * this->size * PAGE_SIZE);
 		this->memoryAllocated = true;
-	}
+                this->summary = NODE_SUMMARY(this->node_content);
+	        this->records = NODE_RECORDS(this->node_content);
+	        memset(this->summary, 0, sizeof(NodeSummary));
+        }
 }
 
-
 void Node::load() {
+        this->valid = true;
 	if (!this->memoryAllocated) {
 		this->node_content = (char*)malloc(sizeof(char) * this->size * PAGE_SIZE);
 		this->memoryAllocated = true;
@@ -36,29 +43,47 @@ void Node::load() {
 	lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
 	read(fd, this->node_content, this->size * PAGE_SIZE);
 	this->summary = NODE_SUMMARY(this->node_content);
+	this->records = NODE_RECORDS(this->node_content);
 }
 
 void Node::flush() {
-	if (!this->summary->isDirty) {
+        DEBUG("    to flush a node");
+        struct stat st;
+        fstat(this->fd, &st);
+        int size = st.st_size;
+
+        cout << "    size of the file: " << size << " PAGE_SIZE: " << PAGE_SIZE << endl;
+	
+        cout << "    fd: " << this->fd << " offset: " << this->offset << " size: " << this->size << endl; 
+        if (!this->summary->isDirty) {
 		return;
 	}
 	// Set this to false before writing
 	this->summary->isDirty = false;
-	lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
+	this->dump();
+        lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
 	write(fd, this->node_content, this->size * PAGE_SIZE);
+        
+        cout << "writing out: " << this->size* PAGE_SIZE << endl;
+        fstat(this->fd, &st);
+        size = st.st_size;
+
+        cout << "    size of the file: " << size << " PAGE_SIZE: " << PAGE_SIZE << endl;
 }
 
 void Node::insert_record(int pos, Key key, int offset) {
-	int i;
+        DEBUG("    inserting a record into node");
+        int i;
 	Record tempRecord, prevRecord;
-
+        
+        cout << "    insert " << key << " into overall: " << this->summary->numRecords << endl;
 	// Initially set the previous record to temp record for copying
 	prevRecord.key = key;
 	prevRecord.offset = offset;
 
-	Record** nodeRecords = this->summary->records;
 	int numRecords = this->summary->numRecords;
-	//assert(pos <= numRecords);
+        Record * record_base = this->records; //(Record *)((char *)this->summary + sizeof(NodeSummary));
+        /*//assert(pos <= numRecords);
 	// The array one right starting at pos
 	for (i=pos; i <= numRecords; i++) {
 		tempRecord.key = nodeRecords[i]->key;
@@ -68,8 +93,26 @@ void Node::insert_record(int pos, Key key, int offset) {
 		prevRecord.key = tempRecord.key;
 		prevRecord.offset = tempRecord.offset;
 	}
+        */
+	assert(pos <= this->summary->numRecords);
+        if (pos == this->summary->numRecords) {
+            record_base[pos].key = key;
+            record_base[pos].offset = offset;
+        }
 
-	// Update the node summary
+	for (i = pos; i < numRecords; i++) {
+		tempRecord.key = record_base[i].key;
+		tempRecord.offset = record_base[i].offset;
+		record_base[i].key = prevRecord.key;
+		record_base[i].offset = prevRecord.offset;
+		prevRecord.key = tempRecord.key;
+		prevRecord.offset = tempRecord.offset;
+        }
+        if (numRecords == 0) {
+            record_base[0].key = key;
+            record_base[0].offset = offset;
+        }
+        // Update the node summary
 	if (pos == 0) {
 		// the new key is the lowest
 		this->summary->lowKey = key;
@@ -82,8 +125,13 @@ void Node::insert_record(int pos, Key key, int offset) {
 }
 
 Record* Node::getRecord(int pos) {
+        if (pos>=this->summary->numRecords) {
+           cout << "larger that largest " << endl; 
+           return NULL;
+
+        }
 	assert(pos < this->summary->numRecords);
-	return (this->summary->records[pos]);
+	return (&(this->records[pos]));
 }
 
 int
@@ -144,11 +192,11 @@ BTree::findPositionInNode(Key key, Node* node)
 	Record* curRecord;
 
 	int numRecords = node->summary->numRecords;
-	Record** nodeRecords = node->summary->records;
-	
+	Record * nodeRecords = node->records;
+        //Record * nodeRecords = (Record *)((char *)node->summary + sizeof(NodeSummary));
 	for (i=0; i<numRecords; i++) {
-		curRecord = nodeRecords[i];
-		if (curRecord->key >= key) {
+		//curRecord = nodeRecords[i];
+		if (nodeRecords[i].key >= key) {
 			return i;
 		}
 	}
@@ -158,36 +206,37 @@ Node
 BTree::btInsertInternal(Node & b, int key, int *median)
 {
     DEBUG("btInsertInternal()");
-    // return a node with the key if need to split this node b
-    // else return 0
 
-    /*
+    Node b1;
+
+    // return a valid node with the key if need to split this node b
+    // else return none valid node
+
     // median store the key need to be insert into b(offset) node
     // return the offset of new splitted node
     int pos;
     int mid;
-    //bTree b2;
     Node b2;
 
     // read this node
-    b.load();      //TODO
-    pos = findNextNode(key, b.node_content);    //search this level  TODO need to return the position should be
-
-    if(pos == KEY_FOUND) { //already exists
-    // nothing to do
-    return 0;
+    b.load();
+    pos = findPositionInNode(key, &b);    //search this level  TODO need to return the position should be
+    //cout << "found at " << pos << endl;
+    Record * to_check_record = b.getRecord(pos);
+    if(to_check_record != NULL && key == to_check_record->key) { //already exists
+        // nothing to do
+        cout << "Key already exists" << endl;
+        return b1;
     }
 
-    if(b.level == this.numLevels) {       //if leaf level and still cannot find
-    //TODO move keys
-    // everybody above pos moves up one space
-    b.insert_record(pos, key, NULL);
 
-    memmove(b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
-
-    // insert this key
-    b->keys[pos] = key;
-    b->numKeys++;
+    // truly need to insert
+    if(b.level == this->numLevels - 1) {       //if leaf level and still cannot find
+        b.dump();
+        b.insert_record(pos, key, INVALID_OFFSET);
+        b.dump();
+    }
+/*
     } else {    // insert into child
 
     // insert in child
@@ -208,14 +257,15 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     b->numKeys++;
     }
     }
-
+*/
     // we waste a tiny bit of space by splitting now
 
     // instead of on next insert
-    if(b->numKeys >= this->fanout) {    // if need split
-    mid = b->numKeys/2;
-
-     *median = b->keys[mid];
+    cout << "FANOUT: " << this->fanOut << endl;
+    if(b.summary->numRecords >= this->fanOut) {    // if need split
+        cout << "    !!!!!!!!!!!!!!!!!!!!!!!!!!!! to split a node" << endl;
+        mid = b.summary->numRecords/2;
+        *median = b.records[mid].key;
 
     // make a new node for keys > median
     // picture is:
@@ -229,29 +279,35 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     //      A B      C D
     //
     //TODO new node, split
-    b2 = malloc(sizeof(*b2));      //TODO need a new node
+        struct stat st;
+        fstat(b.fd, &st);
+        int size = st.st_size;
 
-    b2->numKeys = b->numKeys - mid - 1;
-    b2->isLeaf = b->isLeaf;
+        cout << "    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 size of the file: " << size << " PAGE_SIZE: " << PAGE_SIZE << endl;
+        b2.initialize(b.level, b.fd, size/PAGE_SIZE, b.size);
+        
+        b.dump();
+        b2.dump();
 
-    memmove(b2->keys, &b->keys[mid+1], sizeof(*(b->keys)) * b2->numKeys);
-    if(!b->isLeaf) {
-	memmove(b2->kids, &b->kids[mid+1], sizeof(*(b->kids)) * (b2->numKeys + 1));
-	}
+        // move all records
+        for (int i = mid+1; i < b.summary->numRecords; i++) {
+            b2.insert_record(i-mid-1, b.records[i].key, b.records[i].offset);
+        }
 
-	b->numKeys = mid;
+        b.summary->highKey = b.records[mid-1].key;
+        b.summary->numRecords = mid;
+        
+        b.dump();
+        b2.dump();
 
-	// TODO write out the nodes
+        b2.valid = true;
+        b.flush();
+        b2.flush();
+        return b2;
+    } 
 
-	return b2;
-} else {
-
-	//TODO write back the node b, when do we need to write back
-
-	return 0;
-}
-return 0;
-*/
+    b.flush();
+    return b1;
 }
 
 bool
@@ -266,50 +322,52 @@ BTree::searchKey(Key key, char * node_to_insert)
 void
 BTree::insertKey(Key key)
 {
-    DEBUG("insertKey()");
+    DEBUG("===== insertKey()");
     //    bTree b1;   // new left child
     //    bTree b2;   // new right child
     
     Node root_node;
     if (this->numLevels == 0) {
-        cout << "inserting root node: " << key << endl;
-        root_node.initialize(0, create_new_file(), 1, this->nodeSize);
+        cout << "    inserting root node: " << key << endl;
+        root_node.initialize(0, create_new_file(), 0, this->nodeSize);
+        cout << "    to insert record" << endl;
         root_node.insert_record(0, key, INVALID_OFFSET);
+        root_node.dump();
         root_node.flush();
+        this->numLevels += 1;
+    
+        // check
+        /*cout << "    ====== check here" << endl;
+        Node check_node;
+        check_node.initialize(0, this->fd_q[0], 0, this->nodeSize);
+        check_node.load();
+        check_node.dump(); */
         return;
     }
     
     int median;
-    root_node.level = 0;
-    root_node.fd =this->fd_q[0];
-    root_node.offset =1;
+    root_node.initialize(0, this->fd_q[0], 0, this->nodeSize);
+    root_node.load();
+    root_node.dump();
 
     Node b2 = btInsertInternal(root_node, key, &median);
+    
+    cout << "==================== get back from btInsertInternal" << endl;
     if(b2.valid) {   // TODO
 	// basic issue here is that we are at the root
 	// so if we split, we have to make a new root
-
+        b2.dump();
         //updata_levels();
         Node new_root_node;
-        new_root_node.level = 0;
-        new_root_node.fd = create_new_file();
-        new_root_node.offset = 1;
-        new_root_node.load();
-        new_root_node.insert_record(-1, -1, root_node.offset);
+        cout << "median: " << median << " offset: " << b2.offset << endl;
+        new_root_node.initialize(0, create_new_file(), 0, this->nodeSize);
         new_root_node.insert_record(0, median, b2.offset);
-
-/*
-	// copy root to b1
-	memmove(b1, b, sizeof(*b));
-
-	// make root point to b1 and b2
-	b->numKeys = 1;
-	b->isLeaf = 0;
-	b->keys[0] = median;
-	b->kids[0] = b1;
-	b->kids[1] = b2;
-*/
+        cout << "here!!!!!!!!!!!!!!!!!!!!!" << endl; 
+        new_root_node.dump();
+        new_root_node.flush();
+        this->numLevels += 1;
     }
+    cout << "===== insert finished " << endl;
     return;
 }
 

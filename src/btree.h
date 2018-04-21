@@ -10,13 +10,15 @@
 #include <stdbool.h>
 #include "layout.h"
 #include <deque>
+#include <iostream>
 
 class Node
 {
 public:
     ~Node() {
-        if (node_content != NULL)
+        /*if (node_content != NULL)
             free(node_content);
+        */ 
     }
 	// Initialize the node
 	void initialize(int level, int fd, int offset, int size);
@@ -28,17 +30,29 @@ public:
 	void insert_record(int pos, Key key, int offset);
 	// Get the record at the position
 	Record* getRecord(int pos);
-	
-        bool valid = false;
-        int level;
-        int fd;
-        int offset;	// page offset within the file
-	int size;	// in number of pages
-	char* node_content;
-	NodeSummary* summary;
+        
+
+        // print
+        void dump() {
+            // print node summary
+            std::cout << "=== dumping a node: " << std::endl;
+            std::cout << "number of records: " << this->summary->numRecords << std::endl;
+            // print all valid records
+            for (int i = 0; i < this->summary->numRecords; i++)
+                std::cout << this->records[i].key << std::endl;
+        }
+
+        bool valid = false;   // whether it is useful or empty
+        int level = -1;
+        int fd = -1;
+        int offset = -1;	// page offset within the file
+	int size = -1;	// in number of pages
+	char* node_content = NULL;
+	NodeSummary* summary = NULL;
+	Record* records = NULL;
 
 private:
-	bool memoryAllocated;
+	bool memoryAllocated = false;
 };
 
 class BTree
