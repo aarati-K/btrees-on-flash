@@ -7,32 +7,34 @@
 #ifndef __BTREE_H__
 #define __BTREE_H__
 
+#include <stdbool.h>
 #include "layout.h"
 #include <deque>
 
 class Node
 {
 public:
-    void load() {
-        // load content to node_content(malloc space for this)
+    ~Node() {
+        if (node_content != NULL)
+            free(node_content);
     }
-
-    void flush() {
-        // write out the node content
-    }
-
-    void insert_record(int pos, Key key, int offset) {
-        // insert a record to position (in memory)
-    }
-    // TODO
-    /*~Node() {
-
-    }*/
     bool valid = false;
-    int level;
-    int fd;
-    int offset;    //offset within the file
-    char * node_content;
+	// load content to node_content
+    void load();
+    // write out the node content
+    void flush();
+    // insert a record to position (in memory)
+    void insert_record(int pos, Key key, int offset);
+    // TODO
+    /*~Node() {}*/
+    
+
+    int level = -1;
+    int fd = -1;
+    int offset = -1;	// page offset within the file
+    int size = 0;	// in number of pages
+    char* node_content = NULL;
+    NodeSummary* nodeSummary;
 };
 
 class BTree
@@ -47,7 +49,7 @@ public:
 	// The initial fill factor of a node. Each page of
 	// the node is filled up to this factor initially.
 	float fillFactor;
-        std::string store_dir;
+	std::string store_dir;
 
 	int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
 
@@ -55,7 +57,7 @@ public:
 	void insertKey(Key key);
 	void deleteKey(Key key);
 
-        //loadfrom();
+    //loadfrom();
 	//flush();  ??
 private:
 	// The file descriptors of the level files
