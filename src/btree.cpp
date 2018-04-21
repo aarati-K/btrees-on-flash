@@ -10,7 +10,6 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
-/* #include <sys/syslimits.h> */
 #include <unistd.h>
 #include <iostream>
 #include <sys/stat.h>
@@ -25,7 +24,7 @@ void BTree::writeMap()
 	// Map each fd to level
 	for (int i = 0; i < this->numLevels; i++) {
 		int fd = this->fd_q[i];
-		char filePath[PATH_MAX];
+		char filePath[128];
 		if (fcntl(fd, F_GETPATH, filePath) != -1) {
 			mapFile << i << " " << filePath << std::endl;
 		}
