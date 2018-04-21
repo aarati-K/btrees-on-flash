@@ -29,8 +29,8 @@
 
 /* void populateTree(BTree tree, int num_values); */
 void generateWorkload(std::string filename, int num_ops, double searches, double insertions, double deletions);
-/* void performWorkload(BTree tree, std::string filename); */
-void performWorkload(std::string filename);
+void performWorkload(BTree tree, std::string filename);
+/* void performWorkload(std::string filename); */
 
 #endif
 

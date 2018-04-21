@@ -1,3 +1,4 @@
+#include "btree.h"
 #include "workloads.h"
 #include "layout.h"
 #include <iostream>
@@ -23,21 +24,21 @@ void generateWorkload(std::string filename, int num_ops, double searches, double
 		double rand_op = double(rand()) / double(RAND_MAX);
 		Key rand_key = (long) round(double(rand()) / double(RAND_MAX) * num_ops);
 		if (rand_op < searches) {
-			std::cout << "search " << rand_key << std::endl;
-			/* outfile << "search " << rand_key << std::endl; */
+			/* std::cout << "search " << rand_key << std::endl; */
+			outfile << "search " << rand_key << std::endl;
 		} else if (rand_op < (searches + insertions)) {
-			std::cout << "insert " << rand_key << std::endl;
-			/* outfile << "insert " << rand_key << std::endl; */
+			/* std::cout << "insert " << rand_key << std::endl; */
+			outfile << "insert " << rand_key << std::endl;
 		} else if (rand_op < (searches + insertions + deletions)) {
-			std::cout << "delete " << rand_key << std::endl;
-			/* outfile << "delete " << rand_key << std::endl; */
+			/* std::cout << "delete " << rand_key << std::endl; */
+			outfile << "delete " << rand_key << std::endl;
 		}
 	}
 	outfile.close();
 }
 
-/* void performWorkload(BTree tree, std::string filename) */
-void performWorkload(std::string filename)
+/* void performWorkload(std::string filename) */
+void performWorkload(BTree tree, std::string filename)
 {
 	std::ifstream infile(filename);
 	std::string operation;
@@ -46,13 +47,13 @@ void performWorkload(std::string filename)
 		/* std::cout << operation << " " << key << "\n"; */
 		if (operation == "search") {
 			/* std::cout << operation << " " << key << "\n"; */
-			tree.search(key);
+			tree.searchKey(key);
 		} else if (operation == "insert") {
 			/* std::cout << operation << " " << key << "\n"; */
-			tree.insert(key);
+			tree.insertKey(key);
 		} else if (operation == "delete") {
 			/* std::cout << operation << " " << key << "\n"; */
-			tree.delete(key);
+			tree.deleteKey(key);
 		}
 	}
 	infile.close();
