@@ -13,20 +13,27 @@
 class Node
 {
 public:
+	// Initialize the node
+	void initialize(int level, int fd, int offset, int size);
 	// load content to node_content
-    void load();
-    // write out the node content
-    void flush();
-    // insert a record to position (in memory)
-    void insert_record(int pos, Key key, int offset);
-    // TODO
-    /*~Node() {}*/
-    int level;
-    int fd;
-    int offset;	// page offset within the file
-    int size;	// in number of pages
-    char* node_content;
-    NodeSummary* nodeSummary;
+	void load();
+	// write out the node content
+	void flush();
+	// insert a record to position (in memory)
+	void insert_record(int pos, Key key, int offset);
+	// Get the record at the position
+	Record* getRecord(int pos);
+	// TODO
+	/*~Node() {}*/
+	int level;
+	int fd;
+	int offset;	// page offset within the file
+	int size;	// in number of pages
+	char* node_content;
+	NodeSummary* summary;
+
+private:
+	bool memoryAllocated;
 };
 
 class BTree
@@ -45,11 +52,11 @@ public:
 
 	int initializeEmptyTree(int treeId, int fanOut, int nodeSize, float fillFactor);
 
-	void searchKey(Key key);
+	int searchKey(Key key);
 	void insertKey(Key key);
 	void deleteKey(Key key);
 
-    //loadfrom();
+	//loadfrom();
 	//flush();  ??
 private:
 	// The file descriptors of the level files
@@ -57,9 +64,9 @@ private:
 	// Node buffer, the node is loaded into the buffer
 	char* nodeBuffer;
 	// Find the next node while searching the tree
-	int findNextNode(Key key, char* node);
-    bool searchKey(Key key, char* node);
-    Node btInsertInternal(Node & b, int key, int *median);
+	int findPositionInNode(Key key, Node* node);
+	bool searchKey(Key key, char* node);
+	Node btInsertInternal(Node & b, int key, int *median);
 };
 
 #endif // __BTREE_H__
