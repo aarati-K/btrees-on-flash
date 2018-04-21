@@ -16,6 +16,7 @@ int BTree::create_new_file() {
    this->fd_q.push_front(fd);
    return fd;
 }
+
 void Node::initialize(int level, int fd, int offset, int size) {
 	this->level = level;
 	this->fd = fd;
@@ -27,7 +28,6 @@ void Node::initialize(int level, int fd, int offset, int size) {
 	}
 }
 
-
 void Node::load() {
 	if (!this->memoryAllocated) {
 		this->node_content = (char*)malloc(sizeof(char) * this->size * PAGE_SIZE);
@@ -36,6 +36,7 @@ void Node::load() {
 	lseek(this->fd, this->offset * PAGE_SIZE, SEEK_SET);
 	read(fd, this->node_content, this->size * PAGE_SIZE);
 	this->summary = NODE_SUMMARY(this->node_content);
+	this->records = NODE_RECORDS(this->node_content);
 }
 
 void Node::flush() {
@@ -56,7 +57,7 @@ void Node::insert_record(int pos, Key key, int offset) {
 	prevRecord.key = key;
 	prevRecord.offset = offset;
 
-	Record** nodeRecords = this->summary->records;
+	Record** nodeRecords = this->records;
 	int numRecords = this->summary->numRecords;
 	assert(pos <= numRecords);
 	// The array one right starting at pos
@@ -83,7 +84,7 @@ void Node::insert_record(int pos, Key key, int offset) {
 
 Record* Node::getRecord(int pos) {
 	assert(pos < this->summary->numRecords);
-	return (this->summary->records[pos]);
+	return (this->records[pos]);
 }
 
 int
@@ -144,7 +145,7 @@ BTree::findPositionInNode(Key key, Node* node)
 	Record* curRecord;
 
 	int numRecords = node->summary->numRecords;
-	Record** nodeRecords = node->summary->records;
+	Record** nodeRecords = node->records;
 	
 	for (i=0; i<numRecords; i++) {
 		curRecord = nodeRecords[i];
@@ -279,7 +280,8 @@ BTree::insertKey(Key key)
         //root_node.load();
 	root_node.node_content = (char*)malloc(sizeof(char) * nodeSize * PAGE_SIZE);
         
-        root_node.nodeSummary = NODE_SUMMARY(root_node.node_content);
+        root_node.summary = NODE_SUMMARY(root_node.node_content);
+        
         root_node.insert_record(0, key, INVALID_OFFSET);
         root_node.flush();
         return;

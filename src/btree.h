@@ -30,12 +30,14 @@ public:
 	Record* getRecord(int pos);
 	// TODO
 	/*~Node() {}*/
+	bool valid;
 	int level;
 	int fd;
 	int offset;	// page offset within the file
 	int size;	// in number of pages
 	char* node_content;
 	NodeSummary* summary;
+	Record** records;
 
 private:
 	bool memoryAllocated;
@@ -71,16 +73,10 @@ private:
 	// Node buffer, the node is loaded into the buffer
 	char* nodeBuffer;
 	// Find the next node while searching the tree
-<<<<<<< HEAD
-	int findNextNode(Key key, char* node);
-        bool searchKey(Key key, char* node);
-        Node btInsertInternal(Node & b, int key, int *median);
-        int create_new_file();
-=======
+	int create_new_file();
 	int findPositionInNode(Key key, Node* node);
 	bool searchKey(Key key, char* node);
 	Node btInsertInternal(Node & b, int key, int *median);
->>>>>>> b3d55a705785ed34d2dd3a89d92ac08a9f0719c2
 };
 
 #endif // __BTREE_H__
