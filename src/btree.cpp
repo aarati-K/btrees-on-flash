@@ -25,9 +25,10 @@ void BTree::writeMap()
 	for (int i = 0; i < this->numLevels; i++) {
 		int fd = this->fd_q[i];
 		char filePath[128];
-		if (fcntl(fd, F_GETPATH, filePath) != -1) {
+/*		if (fcntl(fd, F_GETPATH, filePath) != -1) {
 			mapFile << i << " " << filePath << std::endl;
 		}
+*/
 	}
 	mapFile.close();
 }
@@ -40,8 +41,8 @@ void BTree::loadMap()
 	int level, filename;
 	// Open each level file and map fd to level in fd_q
 	while (mapFile >> level >> filename) {
-		int fd = open((store_dir + filename.c_str(), O_RDWR);
-		this->fd_q.push_back(fd);
+	//	int fd = open((store_dir + filename.c_str(), O_RDWR);
+	//	this->fd_q.push_back(fd);
 	}
 	mapFile.close();
 }
@@ -255,7 +256,7 @@ BTree::btInsertInternal(Node & b, int key, int *median)
     // read this node
     b.load();
     pos = findPositionInNode(key, &b);    //search this level  TODO need to return the position should be
-    //cout << "found at " << pos << endl;
+    cout << "found at " << pos << endl;
     Record * to_check_record = b.getRecord(pos);
     if(to_check_record != NULL && key == to_check_record->key) { //already exists
         // nothing to do
@@ -269,29 +270,20 @@ BTree::btInsertInternal(Node & b, int key, int *median)
         b.dump();
         b.insert_record(pos, key, INVALID_OFFSET);
         b.dump();
-    }
-/*
     } else {    // insert into child
 
     // insert in child
-    // TODO construct the child node
-    b2 = btInsertInternal( b->kids[pos] , key, &mid);
+    Node child_node;
+    child_node.initialize(b.level+1, this->fd_q[b.level+1], b.records[pos].offset, b.size);   //TODO check offset
+    b2 = btInsertInternal(child_node, key, &mid);
 
     // maybe insert a new key in b
-    if(b2) {    // need to add key to this layer, when inserting to child
-    // insert to here  TODO related Record
-    // every key above pos moves up one space
-    b.insert_record(pos, mid, b2->offset);
-    memmove(&b->keys[pos+1], &b->keys[pos], sizeof(*(b->keys)) * (b->numKeys - pos));
-    // new kid goes in pos + 1
-    memmove(&b->kids[pos+2], &b->kids[pos+1], sizeof(*(b->keys)) * (b->numKeys - pos));
-
-    b->keys[pos] = mid;
-    b->kids[pos+1] = b2;
-    b->numKeys++;
+    if(b2.valid) {    // need to add key to this layer, when inserting to child
+        // insert to here
+        // every key above pos moves up one space
+        b.insert_record(pos, mid, b2.offset);
     }
     }
-*/
     // we waste a tiny bit of space by splitting now
 
     // instead of on next insert
@@ -356,10 +348,10 @@ BTree::searchKey(Key key, char * node_to_insert)
 void
 BTree::insertKey(Key key)
 {
-    DEBUG("===== insertKey()");
+    DEBUG("\n===== insertKey()");
     //    bTree b1;   // new left child
     //    bTree b2;   // new right child
-    
+    cout << key << endl; 
     Node root_node;
     if (this->numLevels == 0) {
         cout << "    inserting root node: " << key << endl;
@@ -386,7 +378,7 @@ BTree::insertKey(Key key)
 
     Node b2 = btInsertInternal(root_node, key, &median);
     
-    cout << "==================== get back from btInsertInternal" << endl;
+    cout << "       get back from btInsertInternal" << endl;
     if(b2.valid) {   // TODO
 	// basic issue here is that we are at the root
 	// so if we split, we have to make a new root

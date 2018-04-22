@@ -14,7 +14,7 @@ int main()
     test_tree.insertKey(1000);
     test_tree.insertKey(10000);
     test_tree.insertKey(100000);
-    //test_tree.insertKey(10);
+    test_tree.insertKey(200);
 
     // Workloads
     // filename, num_ops, searches, insertions, deletions
